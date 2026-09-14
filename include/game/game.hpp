@@ -1,3 +1,6 @@
+#ifndef GAME_HPP
+#define GAME_HPP
+
 #include <raylib.h>
 
 class Game{
@@ -12,3 +15,5 @@ class Game{
     void Draw();
     void FreeResources();
 };
+
+#endif
