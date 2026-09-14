@@ -9,6 +9,7 @@ RAYLIB_PATH    := D:/raylib-6.0_win32_mingw-w64
 COMPILER_PATH  := D:/w64devkit
 
 CXX   := $(COMPILER_PATH)/bin/g++.exe
+CC    := $(COMPILER_PATH)/bin/gcc.exe
 RM    := $(COMPILER_PATH)/bin/rm.exe
 MKDIR := $(COMPILER_PATH)/bin/mkdir.exe
 CP    := $(COMPILER_PATH)/bin/cp.exe
@@ -25,15 +26,14 @@ TARGET    := $(BIN_DIR)/game.exe
 # Walks every sub-directory of $1 looking for files matching $2
 rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
-# ---- Gather every .cpp file under src/ (any depth) ----
-SRCS := $(call rwildcard,$(SRC_DIR)/,*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+# ---- Gather every .cpp and .c file under src/ (any depth) ----
+SRCS := $(call rwildcard,$(SRC_DIR)/,*.cpp) $(call rwildcard,$(SRC_DIR)/,*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS:.c=.o))
 DEPS := $(OBJS:.o=.d)
 
-# ---- Gather every folder under include/ that contains a .hpp ----
-# so "#include "thing.hpp"" works no matter which subfolder it lives in.
-INCLUDE_SUBDIRS := $(sort $(dir $(call rwildcard,$(INC_DIR)/,*.hpp)))
-SRC_SUBDIRS      := $(sort $(dir $(call rwildcard,$(SRC_DIR)/,*.hpp)))
+# ---- Gather every folder under include/ that contains a .hpp or .h ----
+INCLUDE_SUBDIRS := $(sort $(dir $(call rwildcard,$(INC_DIR)/,*.hpp)) $(dir $(call rwildcard,$(INC_DIR)/,*.h)))
+SRC_SUBDIRS      := $(sort $(dir $(call rwildcard,$(SRC_DIR)/,*.hpp)) $(dir $(call rwildcard,$(SRC_DIR)/,*.h)))
 
 INCLUDE_DIRS := $(INC_DIR) $(SRC_DIR) $(INCLUDE_SUBDIRS) $(SRC_SUBDIRS)
 
@@ -41,6 +41,8 @@ INCLUDE_DIRS := $(INC_DIR) $(SRC_DIR) $(INCLUDE_SUBDIRS) $(SRC_SUBDIRS)
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -MMD -MP \
             $(addprefix -I,$(INCLUDE_DIRS)) \
             -I$(RAYLIB_PATH)/include
+
+CFLAGS := -std=c17 -Wall -Wextra -O2
 
 LDFLAGS := -L$(RAYLIB_PATH)/lib
 LDLIBS  := -lraylib -lopengl32 -lgdi32 -lwinmm -static -static-libgcc -static-libstdc++
@@ -57,10 +59,15 @@ all: $(TARGET) resources
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
 
-# Compile (mirrors src/ subfolder structure into build/)
+# Compile C++ files (mirrors src/ subfolder structure into build/)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@$(MKDIR) -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Compile C files (mirrors src/ subfolder structure into build/)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+	@$(MKDIR) -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR):
 	@$(MKDIR) -p $(BUILD_DIR)
