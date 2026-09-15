@@ -5,7 +5,8 @@
 # =========================================================
 
 # ---- Portable toolchain / library locations ----
-RAYLIB_PATH    := D:/raylib-6.0_win32_mingw-w64
+# Default to 64-bit build
+RAYLIB_PATH    := D:/raylib-6.0_win64_mingw-w64
 COMPILER_PATH  := D:/w64devkit
 
 CXX   := $(COMPILER_PATH)/bin/g++.exe
@@ -87,3 +88,8 @@ clean:
 
 # Auto-generated header dependency files
 -include $(DEPS)
+
+# ---- Build 32-bit version (uncomment to build for 32-bit) ----
+# 32-bit build target (requires raylib-6.0_win32_mingw-w64)
+# 32-bit build: RAYLIB_PATH := D:/raylib-6.0_win32_mingw-w64 CXXFLAGS += -m32 CFLAGS += -m32 LDFLAGS += -m32
+# 32-bit target: $(TARGET): $(OBJS) | $(BIN_DIR) $(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)

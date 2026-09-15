@@ -7,7 +7,7 @@
     "C_Cpp.default.includePath": [
         "${workspaceFolder}/include/**",
         "${workspaceFolder}/src/**",
-        "D:/raylib-6.0_win32_mingw-w64/include"
+        "D:/raylib-6.0_win64_mingw-w64/include"
     ],
 
     // ---- Make sure the integrated terminal can find gcc/g++/make/gdb ----

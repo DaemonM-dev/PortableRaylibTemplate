@@ -12,8 +12,7 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "problemMatcher": ["$gcc"]
+            }
         },
         {
             "label": "Run (make run)",
@@ -26,8 +25,7 @@
             "group": {
                 "kind": "test",
                 "isDefault": true
-            },
-            "problemMatcher": ["$gcc"]
+            }
         },
         {
             "label": "Clean (make clean)",
@@ -36,8 +34,25 @@
             "args": ["clean"],
             "options": {
                 "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
+            }
+        },
+        {
+            "label": "Build x64",
+            "type": "shell",
+            "command": "D:/w64devkit/bin/make.exe",
+            "args": ["x64"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Build x86",
+            "type": "shell",
+            "command": "D:/w64devkit/bin/make.exe",
+            "args": ["x86"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
 }
