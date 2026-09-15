@@ -29,7 +29,11 @@ rwildcard = $(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2
 
 # ---- Gather every .cpp and .c file under src/ (any depth) ----
 SRCS := $(call rwildcard,$(SRC_DIR)/,*.cpp) $(call rwildcard,$(SRC_DIR)/,*.c)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS:.c=.o))
+
+# ---- Separate C and C++ object files ----
+C_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter %.c,$(SRCS)))
+CPP_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(filter %.cpp,$(SRCS)))
+OBJS := $(C_OBJS) $(CPP_OBJS)
 DEPS := $(OBJS:.o=.d)
 
 # ---- Gather every folder under include/ that contains a .hpp or .h ----
@@ -43,7 +47,7 @@ CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -MMD -MP \
             $(addprefix -I,$(INCLUDE_DIRS)) \
             -I$(RAYLIB_PATH)/include
 
-CFLAGS := -std=c17 -Wall -Wextra -O2
+CFLAGS := -std=c17 -Wall -Wextra -O2 -I$(RAYLIB_PATH)/include
 
 LDFLAGS := -L$(RAYLIB_PATH)/lib
 LDLIBS  := -lraylib -lopengl32 -lgdi32 -lwinmm -static -static-libgcc -static-libstdc++
@@ -88,8 +92,3 @@ clean:
 
 # Auto-generated header dependency files
 -include $(DEPS)
-
-# ---- Build 32-bit version (uncomment to build for 32-bit) ----
-# 32-bit build target (requires raylib-6.0_win32_mingw-w64)
-# 32-bit build: RAYLIB_PATH := D:/raylib-6.0_win32_mingw-w64 CXXFLAGS += -m32 CFLAGS += -m32 LDFLAGS += -m32
-# 32-bit target: $(TARGET): $(OBJS) | $(BIN_DIR) $(CXX) $(OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
